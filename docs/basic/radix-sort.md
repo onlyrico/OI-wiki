@@ -38,7 +38,7 @@
 
 将待排序的元素拆分为 $k$ 个关键字，先对第 $1$ 关键字进行稳定排序，然后对于每组 **具有相同关键字的元素** 再对第 $2$ 关键字进行稳定排序（递归执行）……最后对于每组 **具有相同关键字的元素** 再对第 $k$ 关键字进行稳定排序。
 
-MSD 基数排序需要借助一种 **稳定算法** 完成内层对关键字的排序，通常使用计数排序来完成。
+一般而言，我们默认基数排序是稳定的，所以在 MSD 基数排序中，我们也仅仅考虑借助 **稳定算法**（通常使用计数排序）完成内层对关键字的排序。
 
 正确性参考上文 k - 关键字元素的比较。
 
@@ -49,71 +49,7 @@ MSD 基数排序需要借助一种 **稳定算法** 完成内层对关键字的�
 下面是使用迭代式 MSD 基数排序对 `unsigned int` 范围内元素进行排序的 C++ 参考代码，可调整 $W$ 和 $\log_2 W$ 的值（建议将 $\log_2 W$ 设为 $2^k$ 以便位运算优化）。
 
 ```cpp
-#include <algorithm>
-#include <stack>
-#include <tuple>
-#include <vector>
-
-using std::copy;  // from <algorithm>
-using std::make_tuple;
-using std::stack;
-using std::tie;
-using std::tuple;
-using std::vector;
-
-typedef unsigned int u32;
-typedef unsigned int* u32ptr;
-
-void MSD_radix_sort(u32ptr first, u32ptr last) {
-  const size_t maxW = 0x100000000llu;
-  const u32 maxlogW = 32;  // = log_2 W
-
-  const u32 W = 256;  // 计数排序的值域
-  const u32 logW = 8;
-  const u32 mask = W - 1;  // 用位运算替代取模，详见下面的 key 函数
-
-  u32ptr tmp =
-      (u32ptr)calloc(last - first, sizeof(u32));  // 计数排序用的输出空间
-
-  typedef tuple<u32ptr, u32ptr, u32> node;
-  stack<node, vector<node>> s;
-  s.push(make_tuple(first, last, maxlogW - logW));
-
-  while (!s.empty()) {
-    u32ptr begin, end;
-    size_t shift, length;
-
-    tie(begin, end, shift) = s.top();
-    length = end - begin;
-    s.pop();
-
-    if (begin + 1 >= end) continue;  // elements <= 1
-
-    // 计数排序
-    u32 cnt[W] = {};
-    auto key = [](const u32 x, const u32 shift) { return (x >> shift) & mask; };
-
-    for (u32ptr it = begin; it != end; ++it) ++cnt[key(*it, shift)];
-    for (u32 value = 1; value < W; ++value) cnt[value] += cnt[value - 1];
-
-    // 求完前缀和后，计算相同关键字的元素范围
-    if (shift >= logW) {
-      s.push(make_tuple(begin, begin + cnt[0], shift - logW));
-      for (u32 value = 1; value < W; ++value)
-        s.push(make_tuple(begin + cnt[value - 1], begin + cnt[value],
-                          shift - logW));
-    }
-
-    u32ptr it = end;
-    do {
-      --it;
-      --cnt[key(*it, shift)];
-      tmp[cnt[key(*it, shift)]] = *it;
-    } while (it != begin);
-
-    copy(tmp, tmp + length, begin);
-  }
-}
+--8<-- "docs/basic/code/radix-sort/radix-sort_1.cpp"
 ```
 
 #### 对字符串排序
@@ -133,17 +69,17 @@ using std::tie;
 using std::tuple;
 using std::vector;
 
-typedef char* NTBS;  // 空终止字节字符串
-typedef NTBS* NTBSptr;
+using NTBS = char*;  // 空终止字节字符串
+using NTBSptr = NTBS*;
 
 void MSD_radix_sort(NTBSptr first, NTBSptr last) {
-  const size_t W = 128;
-  const size_t logW = 7;
-  const size_t mask = W - 1;
+  static constexpr size_t W = 128;
+  static constexpr size_t logW = 7;
+  static constexpr size_t mask = W - 1;
 
   NTBSptr tmp = (NTBSptr)calloc(last - first, sizeof(NTBS));
 
-  typedef tuple<NTBSptr, NTBSptr, size_t> node;
+  using node = tuple<NTBSptr, NTBSptr, size_t>;
   stack<node, vector<node>> s;
   s.push(make_tuple(first, last, 0));
 
@@ -248,9 +184,9 @@ $$
 下面是使用 LSD 基数排序实现的对 k - 关键字元素的排序。
 
 ```cpp
-const int N = 100010;
-const int W = 100010;
-const int K = 100;
+constexpr int N = 100010;
+constexpr int W = 100010;
+constexpr int K = 100;
 
 int n, w[K], k, cnt[W];
 
@@ -316,7 +252,7 @@ void radix_sort() {
     
     int main() {
       std::ios::sync_with_stdio(false);
-      std::cin.tie(0);
+      std::cin.tie(nullptr);
       int n;
       std::cin >> n;
       int *a = new int[n];

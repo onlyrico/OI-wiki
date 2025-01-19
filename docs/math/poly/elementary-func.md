@@ -120,11 +120,11 @@ $$
 
 ??? "多项式求逆"
     ```cpp
-    constexpr int maxn = 262144;
+    constexpr int MAXN = 262144;
     constexpr int mod = 998244353;
     
     using i64 = long long;
-    using poly_t = int[maxn];
+    using poly_t = int[MAXN];
     using poly = int *const;
     
     void polyinv(const poly &h, const int n, poly &f) {
@@ -312,13 +312,7 @@ $$
     $$
     
     $$
-    n[x^{n}]\exp{f(x)} = \sum_{i = 0}^{n} \left([x^{i}]\exp{f(x)}\right) \left((n - i + 1)[x^{n - i}]f(x)\right)
-    $$
-    
-    又 $[x^{0}]f(x)=0$，则：
-    
-    $$
-    n[x^{n}]\exp{f(x)} = \sum_{i = 0}^{n - 1} \left([x^{i}]\exp{f(x)}\right) \left((n - i + 1)[x^{n - i}]f(x)\right)
+    n[x^{n}]\exp{f(x)} = \sum_{i = 0}^{n - 1} \left([x^{i}]\exp{f(x)}\right) \left((n - i)[x^{n - i}]f(x)\right)
     $$
     
     使用分治 FFT 即可解决。
@@ -333,11 +327,11 @@ $$
 
 ??? "多项式 ln/exp"
     ```cpp
-    constexpr int maxn = 262144;
+    constexpr int MAXN = 262144;
     constexpr int mod = 998244353;
     
     using i64 = long long;
-    using poly_t = int[maxn];
+    using poly_t = int[MAXN];
     using poly = int *const;
     
     void derivative(const poly &h, const int n, poly &f) {
@@ -452,12 +446,12 @@ $$
     $$
     
     ```cpp
-    constexpr int maxn = 262144;
+    constexpr int MAXN = 262144;
     constexpr int mod = 998244353;
     constexpr int imgunit = 86583718; /* sqrt(-1) = sqrt(998233452) */
     
     using i64 = long long;
-    using poly_t = int[maxn];
+    using poly_t = int[MAXN];
     using poly = int *const;
     
     void polytri(const poly &h, const int n, poly &sin_t, poly &cos_t) {
@@ -520,11 +514,11 @@ $$
 
 ??? "多项式反三角函数"
     ```cpp
-    constexpr int maxn = 262144;
+    constexpr int MAXN = 262144;
     constexpr int mod = 998244353;
     
     using i64 = long long;
-    using poly_t = int[maxn];
+    using poly_t = int[MAXN];
     using poly = int *const;
     
     void derivative(const poly &h, const int n, poly &f) {
